@@ -1,0 +1,20 @@
+rules_version = '2';
+// DesignNext Studio — Firebase Storage Rules
+// วิธีใช้: Firebase Console > Storage > Rules > วางไฟล์นี้ > Publish
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isAdmin() { return request.auth != null && request.auth.token.email in ['admin@designnext.studio']; }
+    function smallerThan(mb) { return request.resource.size < mb * 1024 * 1024; }
+
+    // ไฟล์แนบจากหน้า Contact / Resume จากหน้า Careers (ใครก็อัปโหลดได้)
+    match /contacts/{file} { allow create: if smallerThan(10); allow read: if isAdmin(); }
+    match /resumes/{file}  { allow create: if smallerThan(5);  allow read: if isAdmin(); }
+
+    // ไฟล์งานของลูกค้าแต่ละคน: files/{uid}/...
+    match /files/{uid}/{file} {
+      allow read: if isAdmin() || (request.auth != null && request.auth.uid == uid);
+      allow create: if (isAdmin() || (request.auth != null && request.auth.uid == uid)) && smallerThan(50);
+      allow delete: if isAdmin();
+    }
+  }
+}

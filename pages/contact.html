@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact | DesignNext Studio</title>
+  <meta name="description" content="ติดต่อ DesignNext Studio ขอใบเสนอราคา ปรึกษาโปรเจกต์">
+  <link rel="icon" href="../images/logo/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body data-page="contact" data-root="../">
+  <header id="site-header"></header>
+
+  <main>
+    <section class="page-hero">
+      <div class="grid-bg"></div><div class="orb orb-1"></div>
+      <div class="container">
+        <div class="breadcrumb fade-up"><a href="../index.html">Home</a><span>/</span><span>Contact</span></div>
+        <span class="eyebrow fade-up d1">Get in touch</span>
+        <h1 class="fade-up d2">มาเริ่ม<span class="gradient-text">โปรเจกต์</span>ด้วยกัน</h1>
+        <p class="fade-up d3">กรอกข้อมูลด้านล่าง ทีมงานจะติดต่อกลับพร้อมใบเสนอราคาภายใน 24 ชั่วโมง</p>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top:20px">
+      <div class="container contact-grid">
+        <!-- ข้อมูลติดต่อบริษัท -->
+        <aside class="card contact-info reveal from-left">
+          <h3>ข้อมูลติดต่อ</h3>
+          <p class="small">ยินดีให้คำปรึกษาฟรี ไม่มีค่าใช้จ่าย</p>
+          <div class="item"><div class="icon-box">📍</div><div><b>ที่อยู่</b><span class="small muted" id="cAddress"></span></div></div>
+          <div class="item"><div class="icon-box">✉️</div><div><b>Email</b><span class="small muted" id="cEmail"></span></div></div>
+          <div class="item"><div class="icon-box">📞</div><div><b>โทรศัพท์</b><span class="small muted" id="cPhone"></span></div></div>
+          <div class="item"><div class="icon-box">🕘</div><div><b>เวลาทำการ</b><span class="small muted" id="cHours"></span></div></div>
+          <div class="divider"></div>
+          <p class="small">ต้องการนัดคุยแบบระบุวันเวลา?</p>
+          <a href="booking.html" class="btn btn-primary btn-block">📅 จองคิวปรึกษา</a>
+        </aside>
+
+        <!-- แบบฟอร์มติดต่อ: บันทึกลง Firestore collection "contacts" + ไฟล์ลง Firebase Storage -->
+        <div class="card reveal from-right">
+          <h3>ส่งข้อความถึงเรา</h3>
+          <form id="contactForm" class="form-grid mt-1" novalidate>
+            <div class="field"><label for="f-name">ชื่อ-นามสกุล <span class="req">*</span></label><input id="f-name" name="name" required autocomplete="name"></div>
+            <div class="field"><label for="f-company">บริษัท</label><input id="f-company" name="company" autocomplete="organization"></div>
+            <div class="field"><label for="f-email">Email <span class="req">*</span></label><input id="f-email" name="email" type="email" required autocomplete="email"></div>
+            <div class="field"><label for="f-phone">เบอร์โทร <span class="req">*</span></label><input id="f-phone" name="phone" type="tel" required autocomplete="tel"></div>
+            <div class="field"><label for="f-service">บริการที่สนใจ <span class="req">*</span></label><select id="f-service" name="service" required></select></div>
+            <div class="field"><label for="f-budget">งบประมาณ</label><select id="f-budget" name="budget"></select></div>
+            <div class="field full"><label for="f-details">รายละเอียดงาน <span class="req">*</span></label><textarea id="f-details" name="details" required placeholder="เล่าเกี่ยวกับธุรกิจของคุณ สิ่งที่ต้องการ และกำหนดเวลาที่ต้องการ"></textarea></div>
+            <div class="field full"><label>Upload File (ไม่เกิน 10MB)</label>
+              <div class="dropzone"><input type="file" name="file" accept=".jpg,.jpeg,.png,.pdf,.zip,.doc,.docx,.ai,.psd"><div class="dz-icon">📎</div><div>ลากไฟล์มาวาง หรือคลิกเพื่อเลือกไฟล์ (Brief, โลโก้เดิม, ภาพอ้างอิง)</div><div class="dz-file"></div></div></div>
+            <div class="full"><button type="submit" class="btn btn-primary btn-block">ส่งข้อมูล →</button></div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+  <script src="../js/data.js"></script>
+  <script src="../js/firebase.js"></script>
+  <script src="../js/script.js"></script>
+  <script>
+    document.getElementById('cAddress').textContent = COMPANY.address;
+    document.getElementById('cEmail').textContent = COMPANY.email;
+    document.getElementById('cPhone').textContent = COMPANY.phone + ' / ' + COMPANY.mobile;
+    document.getElementById('cHours').textContent = COMPANY.hours;
+  </script>
+</body>
+</html>

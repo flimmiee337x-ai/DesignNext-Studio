@@ -1,0 +1,45 @@
+rules_version = '2';
+// DesignNext Studio — Firestore Security Rules
+// วิธีใช้: Firebase Console > Firestore Database > Rules > วางไฟล์นี้ > Publish
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    // ต้องตรงกับ ADMIN_EMAILS ใน js/firebase.js
+    function isAdmin() { return signedIn() && request.auth.token.email in ['admin@designnext.studio']; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+    function ownsNew() { return signedIn() && request.resource.data.customerId == request.auth.uid; }
+    function ownsDoc() { return signedIn() && resource.data.customerId == request.auth.uid; }
+
+    // ผู้ใช้ / ลูกค้า
+    match /users/{uid}     { allow read, write: if isOwner(uid) || isAdmin(); }
+    match /customers/{uid} { allow read, write: if isOwner(uid) || isAdmin(); }
+
+    // ข้อมูลของลูกค้าแต่ละราย (customerId = uid ของลูกค้า)
+    match /projects/{id}   { allow read: if ownsDoc() || isAdmin(); allow create: if ownsNew() || isAdmin(); allow update, delete: if isAdmin(); }
+    match /quotations/{id} {
+      allow read: if ownsDoc() || isAdmin();
+      allow create: if ownsNew() || isAdmin();
+      // ลูกค้าอนุมัติ/ปฏิเสธใบเสนอราคาของตัวเองได้ (แก้ได้เฉพาะสถานะ)
+      allow update: if isAdmin() || (ownsDoc() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'approvedAt', 'rejectedAt', 'updatedAt']));
+      allow delete: if isAdmin();
+    }
+    match /messages/{id}   { allow read: if ownsDoc() || isAdmin(); allow create: if ownsNew() || isAdmin(); allow update, delete: if isAdmin(); }
+    match /files/{id}      { allow read: if ownsDoc() || isAdmin(); allow create: if ownsNew() || isAdmin(); allow update, delete: if isAdmin(); }
+
+    // แบบฟอร์มสาธารณะ: ใครก็ส่งได้ แต่อ่าน/แก้ได้เฉพาะ Admin
+    // bookings อ่านได้สาธารณะ เพื่อเช็กช่วงเวลาว่าง และให้ลูกค้าตรวจสถานะด้วย Booking ID
+    // (โปรเจกต์จริงควรย้ายไปใช้ Cloud Functions เพื่อไม่เปิดเผยข้อมูลติดต่อ)
+    match /bookings/{id}     { allow create: if true; allow read: if true; allow update, delete: if isAdmin(); }
+    match /applications/{id} { allow create: if true; allow read, update, delete: if isAdmin(); }
+    match /contacts/{id}     { allow create: if true; allow read, update, delete: if isAdmin(); }
+
+    // ข้อมูลภายในบริษัท
+    match /employees/{id} { allow read, write: if isAdmin(); }
+    match /finance/{id}   { allow read, write: if isAdmin(); }
+    match /meta/{id}      { allow read, write: if isAdmin(); }
+
+    // ตัวนับเลขที่เอกสาร (DN-BK-0001, DN-APP-0001 ...)
+    match /counters/{id}  { allow read, write: if true; }
+  }
+}
